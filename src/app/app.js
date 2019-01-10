@@ -12,7 +12,7 @@ const myAppToolbar = {
       icon: "wxi-user",
       label: "Profile",
       width: 114,
-      inputWidth: 90,
+      inputWidth: 90
     },
   ],
 };
@@ -35,7 +35,7 @@ const connectedLabel = {
   view: "label",
   id: "connectedLabel",
   css: "connected",
-  height: 60,
+  height: 60
 };
 
 const filmsDatatable = {
@@ -48,14 +48,9 @@ const filmsDatatable = {
 
 const editFilmsForm = {
   view: "form",
-  borderless: true,
-  padding: 0,
-  cols: [
-    { width: 16 },
-    {
-      margin: 12,
-      minWidth: 200,
-      rows: [
+  autoheight: false,
+      elements: [
+        { type: "section", template: "EDIT FILMS" },
         { view: "text", label: "Title" },
         { view: "text", label: "Year" },
         { view: "text", label: "Rating" },
@@ -67,9 +62,6 @@ const editFilmsForm = {
           ],
         },
       ],
-    },
-    { width: 16 },
-  ],
 };
 
 const copyrightLabel = {
@@ -87,19 +79,7 @@ webix.ui({
         { css: "bg--grey", rows: [mainList, {}, connectedLabel] },
         { view: "resizer" },
         filmsDatatable,
-        {
-          gravity: 1.3,
-          cols: [
-            {
-              rows: [
-                { height: 16 },
-                { cols: [{ width: 20 }, { type: "section", template: "EDIT FILMS" }] },
-                editFilmsForm,
-                { view: "template", borderless: false, css: "border-top--hidden" },
-              ],
-            },
-          ],
-        },
+        editFilmsForm
       ],
     },
     copyrightLabel,
