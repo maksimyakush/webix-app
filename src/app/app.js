@@ -1,5 +1,27 @@
 import moviesData from "../data/moviesData.js";
 
+const addItem = () => {
+  const isValidated = $$("editFilmsForm").validate();
+  if (isValidated) {
+    $$("filmsDatatable").add($$("editFilmsForm").getValues());
+    webix.message("The data is added");
+    $$("editFilmsForm").clear();
+  }
+};
+
+const clearForm = () => {
+  webix.confirm({
+    title: "Clear",
+    text: "Are you sure you want to clear form?",
+    callback(result) {
+      if (result) {
+        $$("editFilmsForm").clear();
+        $$("editFilmsForm").clearValidation();
+      }
+    }
+  });
+};
+
 const menuPopup = {
   view: "popup",
   id: "menuPopup",
@@ -104,22 +126,12 @@ const editFilmsForm = {
           view: "button",
           value: "Add new",
           type: "form",
-          click: () => {
-            const isValidated = $$("editFilmsForm").validate();
-            if (isValidated) {
-              $$("filmsDatatable").add($$("editFilmsForm").getValues());
-              webix.message("The data is added");
-              $$("editFilmsForm").clear();
-            }
-          }
+          click: addItem
         },
         {
           view: "button",
           value: "Clear",
-          click: () => {
-            $$("editFilmsForm").clear();
-            $$("editFilmsForm").clearValidation();
-          }
+          click: clearForm
         }
       ]
     }
