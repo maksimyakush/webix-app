@@ -3,10 +3,16 @@
   padding: 0;
 }
 
+.webix_template .copyright {
+  text-align: center;
+}
+
 .connected {
   text-align: center;
   font-size: 20px !important;
   color: #24a259 !important;
+  background-color: #eee !important;
+
 }
 
 .fas {
