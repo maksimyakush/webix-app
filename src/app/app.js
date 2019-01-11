@@ -1,8 +1,7 @@
 import moviesData from "../data/moviesData.js";
 
 const addItem = () => {
-  const isValidated = $$("editFilmsForm").validate();
-  if (isValidated) {
+  if ($$("editFilmsForm").validate()) {
     $$("filmsDatatable").add($$("editFilmsForm").getValues());
     webix.message("The data is added");
     $$("editFilmsForm").clear();
@@ -71,7 +70,7 @@ const connectedTemplate = {
   css: "connected",
   autoheight: 1,
   type: "clean",
-  template: "<i class=\"fas fa-check\"></i><span>Connected</span>"
+  template: "<i class='webix_icon wxi-check'></i><span>Connected</span>"
 };
 
 const filmsDatatable = {
@@ -91,8 +90,8 @@ const editFilmsForm = {
   rules: {
     title: webix.rules.isNotEmpty,
     year: value => value > 1970 && value < 2019,
-    votes: value => value < 100000,
-    rating: value => value !== 0 && value !== ""
+    rating: value => value != 0 && webix.rules.isNotEmpty(value),
+    votes: value => value < 100000 && webix.rules.isNotEmpty(value)
   },
   elements: [
     { type: "section", template: "EDIT FILMS" },
