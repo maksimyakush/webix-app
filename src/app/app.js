@@ -2,7 +2,10 @@ import moviesData from "../data/moviesData.js";
 
 const addItem = () => {
   if ($$("editFilmsForm").validate()) {
-    $$("filmsDatatable").add($$("editFilmsForm").getValues());
+    const regexDeleteTags = /(<[^>]+>|<[^>]>|<\/[^>]>)/g;
+    const dataToAdd = { ...$$("editFilmsForm").getValues() };
+    for (const item in dataToAdd) dataToAdd[item] = dataToAdd[item].replace(regexDeleteTags, "");
+    $$("filmsDatatable").add(dataToAdd);
     webix.message("The data is added");
     $$("editFilmsForm").clear();
   }
