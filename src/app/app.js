@@ -94,7 +94,8 @@ const editFilmsForm = {
     title: webix.rules.isNotEmpty,
     year: value => value > 1970 && value < 2019,
     rating: value => value != 0 && webix.rules.isNotEmpty(value),
-    votes: value => value < 100000 && webix.rules.isNotEmpty(value)
+    votes: value => value < 100000 && webix.rules.isNotEmpty(value),
+    rank: webix.rules.isNotEmpty
   },
   elements: [
     { type: "section", template: "EDIT FILMS" },
@@ -108,19 +109,29 @@ const editFilmsForm = {
       view: "text",
       label: "Year",
       name: "year",
+      type: "number",
       invalidMessage: "Enter year between 1970 and 2019"
     },
     {
       view: "text",
       label: "Rating",
       name: "rating",
+      type: "number",
       invalidMessage: "Rating cannot be empty or 0"
     },
     {
       view: "text",
       label: "Votes",
       name: "votes",
+      type: "number",
       invalidMessage: "Votes must be less than 100000"
+    },
+    {
+      view: "text",
+      label: "Rank",
+      name: "rank",
+      type: "number",
+      invalidMessage: "Rank cannot be empty"
     },
     {
       cols: [
