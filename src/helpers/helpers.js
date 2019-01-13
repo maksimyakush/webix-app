@@ -6,7 +6,6 @@ const stripHTML = (dataToAdd) => {
     if (item === "id") continue;
     dataToAdd[item] = dataToAdd[item].replace(regexDeleteTags, "");
   }
-
   return dataToAdd;
 };
 

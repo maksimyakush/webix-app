@@ -2,7 +2,6 @@ import { sortVotes, startCompare, stripHTML } from "../helpers/helpers.js";
 
 const addItem = () => {
   if (!$$("editFilmsForm").validate()) return;
-
   const strippedFromHTMLFormData = stripHTML(webix.copy($$("editFilmsForm").getValues()));
   strippedFromHTMLFormData.rating = strippedFromHTMLFormData.rating.replace(".", ",");
   $$("filmsDatatable").add(strippedFromHTMLFormData);
@@ -29,7 +28,6 @@ const updateForm = () => {
     return;
   }
   if (!$$("editFilmsForm").validate()) return;
-
   const strippedFromHTMLFormData = stripHTML(webix.copy($$("editFilmsForm").getValues()));
   strippedFromHTMLFormData.rating = strippedFromHTMLFormData.rating.replace(".", ",");
   $$("filmsDatatable").updateItem($$("filmsDatatable").getSelectedId(), strippedFromHTMLFormData);
@@ -148,8 +146,6 @@ const filmsDatatable = {
       data.votes = data.votes.replace(/,/g, "");
       data.rating = data.rating.replace(",", ".");
       $$("editFilmsForm").setValues(data);
-
-      console.log($$("editFilmsForm").getValues(data));
     }
   }
 };
