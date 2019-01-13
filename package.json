@@ -1,0 +1,22 @@
+{
+  "name": "webix-app",
+  "version": "1.0.0",
+  "description": "Date | Task | Presentation | Status\r --- | --- | --- | ---\r 01/10  | [Task Description](https://docs.google.com/document/d/1K47bxXj1gmdV-IIKgq8t2ZVwtTg-FNR6KcJY0RwhQWA/edit#) | [Presentation](https://slides.com/ihelga/webixlayouts/#/) | :heavy_check_mark:\r 02/10  | [Task Description](https://docs.google.com/document/d/1pOb4KrHb84AqhxVXnwRXvQNtfqbG-tY3x0iHTVHVo9M/edit#) | [Presentation](https://slides.com/ihelga/webixevents/#/) | :heavy_check_mark:\r ###### Latest Web Version is [here](https://webix-app.netlify.com)",
+  "main": "./server/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maksimyakush/webix-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maksimyakush/webix-app/issues"
+  },
+  "homepage": "https://github.com/maksimyakush/webix-app#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}

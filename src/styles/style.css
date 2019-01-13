@@ -23,6 +23,34 @@
   border-top: none !important;
 }
 
-.bg--grey {
-  background-color: #eee !important;
+.bg--grey, .bg--grey .webix_list {
+  background-color: #eee;
+}
+
+.removeItem:hover {
+  opacity: .7;
+  cursor: pointer;
+  transition: .1s;
+}
+
+.removeItem:active {
+  opacity: .9;
+}
+
+.films-datatable--hover {
+  background-color: #F4F5F9;
+}
+
+.list-row {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+}
+
+.removeUserItem {
+  justify-self: center;
+  align-self: center;
+}
+
+.bg--orange {
+  background-color: orange;
 }
