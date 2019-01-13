@@ -182,7 +182,6 @@ const editFilmsForm = {
       label: "Rating",
       name: "rating",
       type: "number",
-
       invalidMessage: "Rating cannot be empty or 0"
     },
     {
@@ -190,7 +189,6 @@ const editFilmsForm = {
       label: "Votes",
       name: "votes",
       type: "number",
-
       invalidMessage: "Votes must be less than 100000"
     },
     {
@@ -198,7 +196,6 @@ const editFilmsForm = {
       label: "Rank",
       name: "rank",
       type: "number",
-
       invalidMessage: "Rank cannot be empty"
     },
     {
@@ -235,8 +232,6 @@ const copyrightTemplate = {
   template:
     "<p class='copyright'>The software is provided by <a href='https://webix.com'>https://webix.com</a>. All rights reserved (c)</p>"
 };
-
-const aside = { css: "bg--grey", rows: [mainList, {}, connectedTemplate] };
 
 const usersToolbar = {
   view: "toolbar",
@@ -315,6 +310,9 @@ const productsTree = {
   id: "productsTree",
   select: true,
   scroll: "y",
+  ready() {
+    this.openAll();
+  },
   columns: [
     {
       id: "id",
@@ -335,6 +333,7 @@ const productsTree = {
   url: "/products"
 };
 
+const aside = { css: "bg--grey", rows: [mainList, {}, connectedTemplate] };
 const main = {
   gravity: 4,
   cells: [
@@ -351,8 +350,8 @@ webix.ui({
 
 webix.ui(menuPopup);
 
-$$("productsTree").openAll();
 $$("usersChart").sync($$("usersList"));
+
 
 // ///////////////////////////////////// data.votes format for server
 // dataToAdd.votes = dataToAdd.votes
