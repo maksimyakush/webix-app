@@ -351,7 +351,6 @@ webix.ui({
 webix.ui(menuPopup);
 
 $$("usersChart").sync($$("usersList"));
-console.log($$("usersList").data)
 
 // ///////////////////////////////////// data.votes format for server
 // dataToAdd.votes = dataToAdd.votes
