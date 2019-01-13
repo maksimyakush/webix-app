@@ -112,7 +112,7 @@ const filmsDatatable = {
     },
     {
       id: "title",
-      header: ["Title", { content: "textFilter" }],
+      header: ["Title", { content: "textFilter", compare: startCompare }],
       fillspace: 1,
       sort: "string"
     },
@@ -351,7 +351,7 @@ webix.ui({
 webix.ui(menuPopup);
 
 $$("usersChart").sync($$("usersList"));
-
+console.log($$("usersList").data)
 
 // ///////////////////////////////////// data.votes format for server
 // dataToAdd.votes = dataToAdd.votes
