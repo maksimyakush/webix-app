@@ -1,18 +1,13 @@
-// import moviesData from "../../server/data/data.js";
-// import users from "../../server/data/users.js";
-// import products from "../../server/data/products.js";
+import { sortVotes, startCompare, stripHTML } from "../helpers/helpers.js";
 
 const addItem = () => {
-  if ($$("editFilmsForm").validate()) {
-    const regexDeleteTags = /(<[^>]+>|<[^>]>|<\/[^>]>)/g;
-    const dataToAdd = { ...$$("editFilmsForm").getValues() };
-    for (const item in dataToAdd) {
-      dataToAdd[item] = dataToAdd[item].replace(regexDeleteTags, "");
-    }
-    $$("filmsDatatable").add(dataToAdd);
-    webix.message("The data is added");
-    $$("editFilmsForm").clear();
-  }
+  if (!$$("editFilmsForm").validate()) return;
+
+  const strippedFromHTMLFormData = stripHTML(webix.copy($$("editFilmsForm").getValues()));
+  strippedFromHTMLFormData.rating = strippedFromHTMLFormData.rating.replace(".", ",");
+  $$("filmsDatatable").add(strippedFromHTMLFormData);
+  webix.message("The data is added");
+  $$("editFilmsForm").clear();
 };
 
 const clearForm = () => {
@@ -33,31 +28,12 @@ const updateForm = () => {
     webix.message("Please, select row to update!");
     return;
   }
-  if ($$("editFilmsForm").validate()) {
-    const regexDeleteTags = /(<[^>]+>|<[^>]>|<\/[^>]>)/g;
-    const dataToAdd = webix.copy($$("editFilmsForm").getValues());
-    dataToAdd.rating = dataToAdd.rating.replace(".", ",");
-    dataToAdd.votes = dataToAdd.votes
-      .split("")
-      .filter(item => item !== ".")
-      .reverse()
-      .reduce((acc, item, i, arr) => {
-        if ((i + 1) % 3 === 0 && i !== arr.length - 1) {
-          return [...acc, item, ","];
-        }
-        return [...acc, item];
-      }, [])
-      .reverse()
-      .join("");
+  if (!$$("editFilmsForm").validate()) return;
 
-    console.log(dataToAdd);
-    for (const item in dataToAdd) {
-      if (item === "id") continue;
-      dataToAdd[item] = dataToAdd[item].replace(regexDeleteTags, "");
-    }
-    $$("filmsDatatable").updateItem($$("filmsDatatable").getSelectedId(), dataToAdd);
-    webix.message("The data is updated");
-  }
+  const strippedFromHTMLFormData = stripHTML(webix.copy($$("editFilmsForm").getValues()));
+  strippedFromHTMLFormData.rating = strippedFromHTMLFormData.rating.replace(".", ",");
+  $$("filmsDatatable").updateItem($$("filmsDatatable").getSelectedId(), strippedFromHTMLFormData);
+  webix.message("The data is updated");
 };
 
 const deleteItem = () => {
@@ -122,13 +98,6 @@ const connectedTemplate = {
   template: "<i class='webix_icon wxi-check'></i><span>Connected</span>"
 };
 
-const sortVotes = (a, b) => a.votes.replace(",", "") - b.votes.replace(",", "");
-function startCompare(value, filter) {
-  value = value.toString();
-  filter = filter.toString();
-
-  return value.indexOf(filter) === 0;
-}
 const filmsDatatable = {
   view: "datatable",
   id: "filmsDatatable",
@@ -153,6 +122,7 @@ const filmsDatatable = {
     {
       id: "votes",
       header: ["Votes", { content: "textFilter", compare: startCompare }],
+      template: obj => obj.votes.replace(",", ""),
       sort: sortVotes
     },
     {
@@ -191,9 +161,9 @@ const editFilmsForm = {
   minWidth: 300,
   rules: {
     title: webix.rules.isNotEmpty,
-    year: value => value > 1970 && value < 2019,
+    year: value => value >= 1970 && value <= 2019,
     rating: value => value != 0 && webix.rules.isNotEmpty(value),
-    votes: value => webix.rules.isNotEmpty(value),
+    votes: value => value < 100000 && webix.rules.isNotEmpty(value),
     rank: webix.rules.isNotEmpty
   },
   elements: [
@@ -387,3 +357,17 @@ webix.ui(menuPopup);
 
 $$("productsTree").openAll();
 $$("usersChart").sync($$("usersList"));
+
+// ///////////////////////////////////// data.votes format for server
+// dataToAdd.votes = dataToAdd.votes
+//   .split("")
+//   .filter(item => item !== ".")
+//   .reverse()
+//   .reduce((acc, item, i, arr) => {
+//     if ((i + 1) % 3 === 0 && i !== arr.length - 1) {
+//       return [...acc, item, ","];
+//     }
+//     return [...acc, item];
+//   }, [])
+//   .reverse()
+//   .join("");
