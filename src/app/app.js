@@ -23,23 +23,25 @@ const clearForm = () => {
 };
 
 const updateForm = () => {
-  if (!$$("filmsDatatable").getSelectedId()) {
+  const selectedItemId = $$("filmsDatatable").getSelectedId();
+  if (!selectedItemId) {
     webix.message("Please, select row to update!");
     return;
   }
   if (!$$("editFilmsForm").validate()) return;
   const strippedFromHTMLFormData = stripHTML(webix.copy($$("editFilmsForm").getValues()));
   strippedFromHTMLFormData.rating = strippedFromHTMLFormData.rating.replace(".", ",");
-  $$("filmsDatatable").updateItem($$("filmsDatatable").getSelectedId(), strippedFromHTMLFormData);
+  $$("filmsDatatable").updateItem(selectedItemId, strippedFromHTMLFormData);
   webix.message("The data is updated");
 };
 
 const deleteItem = () => {
-  if (!$$("filmsDatatable").getSelectedId()) {
+  const selectedItemId = $$("filmsDatatable").getSelectedId();
+  if (!selectedItemId) {
     webix.message("Select row to delete!");
     return;
   }
-  $$("filmsDatatable").remove($$("filmsDatatable").getSelectedId());
+  $$("filmsDatatable").remove(selectedItemId);
 };
 
 const menuPopup = {
