@@ -1,13 +1,6 @@
-import { sortVotes, startCompare, stripHTML } from "../helpers/helpers.js";
+import { startCompare, stripHTML, getRandomNumber, getRandomUser } from "../helpers/helpers.js";
 
-const addItem = () => {
-  if (!$$("editFilmsForm").validate()) return;
-  const strippedFromHTMLFormData = stripHTML(webix.copy($$("editFilmsForm").getValues()));
-  strippedFromHTMLFormData.rating = strippedFromHTMLFormData.rating.replace(".", ",");
-  $$("filmsDatatable").add(strippedFromHTMLFormData);
-  webix.message("The data is added");
-  $$("editFilmsForm").clear();
-};
+webix.protoUI({ name: "editlist" }, webix.EditAbility, webix.ui.list);
 
 const clearForm = () => {
   webix.confirm({
@@ -16,32 +9,25 @@ const clearForm = () => {
     callback(result) {
       if (result) {
         $$("editFilmsForm").clear();
+        $$("filmsDatatable").unselectAll();
         $$("editFilmsForm").clearValidation();
       }
     }
   });
 };
 
-const updateForm = () => {
-  const selectedItemId = $$("filmsDatatable").getSelectedId();
-  if (!selectedItemId) {
-    webix.message("Please, select row to update!");
-    return;
-  }
+const saveForm = () => {
   if (!$$("editFilmsForm").validate()) return;
-  const strippedFromHTMLFormData = stripHTML(webix.copy($$("editFilmsForm").getValues()));
-  strippedFromHTMLFormData.rating = strippedFromHTMLFormData.rating.replace(".", ",");
-  $$("filmsDatatable").updateItem(selectedItemId, strippedFromHTMLFormData);
-  webix.message("The data is updated");
-};
-
-const deleteItem = () => {
-  const selectedItemId = $$("filmsDatatable").getSelectedId();
-  if (!selectedItemId) {
-    webix.message("Select row to delete!");
-    return;
+  const id = $$("editFilmsForm").getValues().id;
+  if (!id) {
+    webix.message("The data is added");
+  } else {
+    webix.message("The data is updated");
   }
-  $$("filmsDatatable").remove(selectedItemId);
+  $$("editFilmsForm").save();
+  $$("filmsDatatable").unselectAll();
+  $$("editFilmsForm").clearValidation();
+  $$("editFilmsForm").clear();
 };
 
 const menuPopup = {
@@ -114,40 +100,66 @@ const filmsDatatable = {
     },
     {
       id: "title",
-      header: ["Title", { content: "textFilter", compare: startCompare }],
+      header: ["Title", { content: "textFilter" }],
       fillspace: 1,
       sort: "string"
     },
-    { id: "year", header: ["Year", { content: "textFilter", compare: startCompare }], sort: "int" },
+    {
+      id: "category",
+      header: ["Category", { content: "selectFilter" }],
+      options: [
+        { id: 1, value: "Drama" },
+        { id: 2, value: "Fiction" },
+        { id: 3, value: "Comedy" },
+        { id: 4, value: "Horror" }
+      ],
+      sort: "string"
+    },
+
     {
       id: "votes",
       header: ["Votes", { content: "textFilter", compare: startCompare }],
-      template: obj => obj.votes.replace(",", ""),
-      sort: sortVotes
+      sort: "int"
     },
     {
       id: "rating",
       header: ["Rating", { content: "textFilter", compare: startCompare }],
       sort: "string"
     },
+    { id: "year", header: ["Year"], sort: "int" },
     { title: "Button", template: "<i class='webix_icon wxi-trash removeItem'></i>", width: 46 }
   ],
   rightSplit: 1,
   leftSplit: 1,
   select: true,
-  gravity: 2.5,
   onClick: {
     removeItem(e, id) {
       this.remove(id);
       return false;
     }
   },
+  scheme: {
+    $change(obj) {
+      obj.rating = obj.rating.replace(",", ".");
+      obj.votes = obj.votes.replace(",", "");
+      obj.category = getRandomNumber(1, 5);
+    }
+  }
+};
+
+const selectorSegmented = {
+  view: "segmented",
+  id: "selectorSegmented",
+  inputWidth: 300,
+  options: [
+    { id: 1, value: "All" },
+    { id: 2, value: "Older" },
+    { id: 3, value: "Modern" },
+    { id: 4, value: "New" }
+  ],
   on: {
-    onAfterSelect(id) {
-      const data = webix.copy(this.getItem(id));
-      data.votes = data.votes.replace(/,/g, "");
-      data.rating = data.rating.replace(",", ".");
-      $$("editFilmsForm").setValues(data);
+    onChange() {
+      $$("filmsDatatable").filterByAll();
     }
   }
 };
@@ -204,19 +216,9 @@ const editFilmsForm = {
       cols: [
         {
           view: "button",
-          value: "Add new",
+          value: "Save",
           type: "form",
-          click: addItem
-        },
-        {
-          view: "button",
-          value: "Delete",
-          click: deleteItem
-        },
-        {
-          view: "button",
-          value: "Update",
-          click: updateForm
+          click: saveForm
         },
         {
           view: "button",
@@ -264,30 +266,42 @@ const usersToolbar = {
       click() {
         $$("usersList").data.sort("name", "desc");
       }
+    },
+    {
+      view: "button",
+      value: "Add User",
+      type: "form",
+      width: 150,
+      click() {
+        $$("usersList").add(getRandomUser());
+      }
     }
   ]
 };
 
 const usersList = {
-  view: "list",
+  view: "editlist",
   id: "usersList",
   select: true,
-  url: "/users",
+  editable: true,
+  editaction: "dblclick",
+  editor: "text",
   template:
-    "<div class='list-row'>#name# from #country# <i class='webix_icon wxi-close removeUserItem'></i></div>",
+    "<div class='list-row'>#name# from #country# (age #age#) <i class='webix_icon wxi-close removeUserItem'></i></div>",
+  editValue: "name",
+  rules: {
+    name: webix.rules.isNotEmpty
+  },
+  url: "/users",
   onClick: {
     removeUserItem(e, id) {
       this.remove(id);
     }
   },
-  ready() {
-    let counter = 0;
-    $$("usersList").data.each((obj) => {
-      if (counter <= 4) {
-        obj.$css = "bg--orange";
-        counter += 1;
-      }
-    });
+  scheme: {
+    $init(obj) {
+      if (obj.age < 26) obj.$css = "bg--yellow";
+    }
   }
 };
 
@@ -295,23 +309,30 @@ const usersChart = {
   view: "chart",
   id: "usersChart",
   type: "bar",
-  value: "#age#",
   border: true,
-  tooltip: {
-    template: "#name# from #country#"
-  },
+  value: "#country#",
   xAxis: {
-    template: "'#age#",
-    title: "Age"
+    template: "#id#",
+    title: "Users per country"
   },
-  url: "/users"
+  yAxis: {
+    start: 0,
+    end: 10,
+    step: 2
+  }
 };
 
 const productsTree = {
   view: "treetable",
   id: "productsTree",
   select: true,
+  editable: true,
+  editaction: "dblclick",
   scroll: "y",
+  rules: {
+    title: webix.rules.isNotEmpty,
+    price: value => value >= 0 && webix.rules.isNotEmpty(value)
+  },
   ready() {
     this.openAll();
   },
@@ -324,12 +345,14 @@ const productsTree = {
       id: "title",
       header: "Title",
       template: " {common.treetable()} #title#",
-      fillspace: true
+      fillspace: true,
+      editor: "text"
     },
     {
       id: "price",
       header: "Price",
-      width: 200
+      width: 200,
+      editor: "text"
     }
   ],
   url: "/products"
@@ -339,20 +362,50 @@ const aside = { css: "bg--grey", rows: [mainList, {}, connectedTemplate] };
 const main = {
   gravity: 4,
   cells: [
-    { id: "Dashboard", cols: [filmsDatatable, editFilmsForm] },
+    {
+      id: "Dashboard",
+      cols: [{ rows: [selectorSegmented, filmsDatatable], gravity: 2.5 }, editFilmsForm]
+    },
     { id: "Users", rows: [{ rows: [usersToolbar, usersList] }, usersChart] },
     { id: "Products", rows: [productsTree] },
     { id: "Locations", template: "Locations" }
   ]
 };
 
-webix.ui({
-  rows: [myAppToolbar, { cols: [aside, { view: "resizer" }, main] }, copyrightTemplate]
-});
-
+webix.ui({ rows: [myAppToolbar, { cols: [aside, { view: "resizer" }, main] }, copyrightTemplate] });
 webix.ui(menuPopup);
 
-$$("usersChart").sync($$("usersList"));
+$$("usersChart").sync($$("usersList"), function () {
+  this.group({
+    by: "country",
+    map: {
+      country: ["country", "count"]
+    }
+  });
+});
+
+$$("editFilmsForm").bind($$("filmsDatatable"));
+
+$$("filmsDatatable").registerFilter(
+  $$("selectorSegmented"),
+  {
+    columnId: "year",
+    compare(value, filter, item) {
+      if (filter == 1) return value;
+      if (filter == 2) return value < 1990;
+      if (filter == 3) return value >= 1990 && value < 2000;
+      if (filter == 4) return value >= 2000;
+    }
+  },
+  {
+    getValue(node) {
+      return node.getValue();
+    },
+    setValue(node, value) {
+      node.setValue(value);
+    }
+  }
+);
 
 // ///////////////////////////////////// data.votes format for server
 // dataToAdd.votes = dataToAdd.votes

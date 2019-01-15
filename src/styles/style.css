@@ -27,6 +27,10 @@
   background-color: #eee;
 }
 
+.bg--yellow {
+  background-color: yellow;
+}
+
 .removeItem:hover {
   opacity: .7;
   cursor: pointer;
