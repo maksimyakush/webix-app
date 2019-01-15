@@ -1,6 +1,17 @@
-import { startCompare, stripHTML, getRandomNumber, getRandomUser } from "../helpers/helpers.js";
+import {
+  startCompare, stripHTML, getRandomNumber, getRandomUser
+} from "../helpers/helpers.js";
 
 webix.protoUI({ name: "editlist" }, webix.EditAbility, webix.ui.list);
+
+const categories = new webix.DataCollection({
+  url: "categories",
+  scheme: {
+    value: "Fantasy"
+  }
+});
+
+const users = new webix.DataCollection({ url: "users" });
 
 const clearForm = () => {
   webix.confirm({
@@ -19,6 +30,7 @@ const clearForm = () => {
 const saveForm = () => {
   if (!$$("editFilmsForm").validate()) return;
   const id = $$("editFilmsForm").getValues().id;
+  console.log($$("editFilmsForm").getValues());
   if (!id) {
     webix.message("The data is added");
   } else {
@@ -73,7 +85,7 @@ const mainList = {
       $$(id).show();
     }
   },
-  data: ["Dashboard", "Users", "Products", "Locations"]
+  data: ["Dashboard", "Users", "Products", "Admin"]
 };
 
 const connectedTemplate = {
@@ -107,12 +119,7 @@ const filmsDatatable = {
     {
       id: "category",
       header: ["Category", { content: "selectFilter" }],
-      options: [
-        { id: 1, value: "Drama" },
-        { id: 2, value: "Fiction" },
-        { id: 3, value: "Comedy" },
-        { id: 4, value: "Horror" }
-      ],
+      options: categories,
       sort: "string"
     },
 
@@ -142,7 +149,7 @@ const filmsDatatable = {
     $change(obj) {
       obj.rating = obj.rating.replace(",", ".");
       obj.votes = obj.votes.replace(",", "");
-      obj.category = getRandomNumber(1, 5);
+      if (!obj.category) obj.category = getRandomNumber(1, 5);
     }
   }
 };
@@ -213,6 +220,12 @@ const editFilmsForm = {
       invalidMessage: "Rank cannot be empty"
     },
     {
+      view: "richselect",
+      label: "Category",
+      name: "category",
+      options: categories
+    },
+    {
       cols: [
         {
           view: "button",
@@ -245,7 +258,7 @@ const usersToolbar = {
       on: {
         onTimedKeyPress() {
           const value = this.getValue().toLowerCase();
-          $$("usersList").filter(obj => obj.name.toLowerCase().indexOf(value) == 0);
+          users.filter(obj => obj.name.toLowerCase().indexOf(value) == 0);
         }
       }
     },
@@ -255,7 +268,7 @@ const usersToolbar = {
       type: "form",
       width: 150,
       click() {
-        $$("usersList").data.sort("name", "asc");
+        users.sort("name", "asc");
       }
     },
     {
@@ -264,7 +277,7 @@ const usersToolbar = {
       type: "form",
       width: 150,
       click() {
-        $$("usersList").data.sort("name", "desc");
+        users.sort("name", "desc");
       }
     },
     {
@@ -273,7 +286,7 @@ const usersToolbar = {
       type: "form",
       width: 150,
       click() {
-        $$("usersList").add(getRandomUser());
+        users.add(getRandomUser());
       }
     }
   ]
@@ -292,10 +305,10 @@ const usersList = {
   rules: {
     name: webix.rules.isNotEmpty
   },
-  url: "/users",
+  data: users,
   onClick: {
     removeUserItem(e, id) {
-      this.remove(id);
+      users.remove(id);
     }
   },
   scheme: {
@@ -358,6 +371,50 @@ const productsTree = {
   url: "/products"
 };
 
+const adminDatatable = {
+  view: "datatable",
+  id: "adminDatatable",
+  editable: true,
+  editaction: "dblclick",
+  height: 400,
+  editor: "text",
+  scroll: "y",
+  columns: [
+    {
+      id: "value",
+      header: "Category",
+      editor: "text",
+      fillspace: true
+    },
+    { title: "Button", template: "<i class='webix_icon wxi-trash removeItem'></i>", width: 46 }
+  ],
+  data: categories,
+  onClick: {
+    removeItem(e, id) {
+      categories.remove(id);
+      return false;
+    }
+  }
+};
+
+const adminForm = {
+  view: "form",
+  id: "adminForm",
+  elements: [
+    { view: "text", name: "value" },
+    {
+      view: "button",
+      value: "Add Category",
+      click: () => {
+        const { value } = $$("adminForm").getValues();
+        value ? categories.add({ value }) : categories.add({});
+        $$("adminForm").clear();
+      }
+    }
+  ]
+};
+
+const adminLayout = { width: 400, type: "space", rows: [adminDatatable, adminForm] };
 const aside = { css: "bg--grey", rows: [mainList, {}, connectedTemplate] };
 const main = {
   gravity: 4,
@@ -366,16 +423,25 @@ const main = {
       id: "Dashboard",
       cols: [{ rows: [selectorSegmented, filmsDatatable], gravity: 2.5 }, editFilmsForm]
     },
-    { id: "Users", rows: [{ rows: [usersToolbar, usersList] }, usersChart] },
-    { id: "Products", rows: [productsTree] },
-    { id: "Locations", template: "Locations" }
+    {
+      id: "Users",
+      rows: [{ rows: [usersToolbar, usersList] }, usersChart]
+    },
+    {
+      id: "Products",
+      rows: [productsTree]
+    },
+    {
+      id: "Admin",
+      rows: [{ align: "center,middle", body: adminLayout }]
+    }
   ]
 };
 
 webix.ui({ rows: [myAppToolbar, { cols: [aside, { view: "resizer" }, main] }, copyrightTemplate] });
 webix.ui(menuPopup);
 
-$$("usersChart").sync($$("usersList"), function () {
+$$("usersChart").sync(users, function () {
   this.group({
     by: "country",
     map: {

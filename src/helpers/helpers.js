@@ -1,5 +1,5 @@
 const startCompare = (value, filter) => value.toLowerCase().indexOf(filter.toLowerCase()) === 0;
-const stripHTML = dataToAdd => {
+const stripHTML = (dataToAdd) => {
   const regexDeleteTags = /(<[^>]+>|<[^>]>|<\/[^>]>)/g;
   for (const item in dataToAdd) {
     if (item == "id") continue;
@@ -22,4 +22,6 @@ const getRandomUser = () => {
   return { name, age, country };
 };
 
-export { startCompare, stripHTML, getRandomNumber, getRandomUser };
+export {
+  startCompare, stripHTML, getRandomNumber, getRandomUser
+};
